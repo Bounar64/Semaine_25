@@ -56,9 +56,9 @@ $autoload['packages'] = array('url');
 | You can also supply an alternative library name to be assigned
 | in the controller:
 |
-|	$autoload['libraries'] = array('user_agent' => 'ua');
+| $autoload['libraries'] = array('user_agent' => 'ua');
 */
-$autoload['libraries'] = array('database', 'form_validation');
+$autoload['libraries'] = array('database', 'form_validation', 'session');
 
 /*
 | -------------------------------------------------------------------

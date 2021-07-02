@@ -1,4 +1,6 @@
-<?php echo form_open_multipart(); ?>
+<?php echo form_open_multipart(); 
+$this->load->library('session');
+?>
 
 
     <div class="row">
@@ -78,7 +80,7 @@
     <div class="form-group">
         <label for="fichier">Ajouter une image :</label> 
         <input type="file" name="fichier" id="fichier" class="form-control" value="<?php echo set_value('pro_photo'); ?>">
-        <small style="color:#FF0000"><?php echo form_error('fichier'); ?></small>
+        <small style="color:#FF0000"><?php if(isset($this->session->fichier)) { echo $this->session->fichier; } ?></small>
     </div>
 
     <div class="form-group">

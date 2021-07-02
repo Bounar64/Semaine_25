@@ -39,28 +39,31 @@ class Main extends CI_Controller
                 if($_FILES) {
                     $extension= substr(strrchr($_FILES['fichier']['name'], '.'), 1); // fichier est la valeur donnée à l'attribut name du champ de type 'file'
                 }
-                $id= $this->db->insert_id(); // récupère la clé primaire (pro_id) 
-                $config['upload_path']= '../views/assets/images/'; // chemin où sera stocké le fichier
+                $last_id= $this->ajouter_model->last_id(); // récupère dernière clé primaire + 1 (équivaut au prochain pro_id généré)
+                // var_dump($last_id);
+                $id= $last_id[0]->name_fichier; // on récupère la propriété de l'objet 
+                $id= intval($id); // on convertie en int
+                $config['upload_path']= '..\ci\assets\images'; // chemin où sera stocké le fichier
                 $config['file_name']= $id.'.'.$extension; // nom du fichier final
                 $config['allowed_types']= 'gif|jpg|jpeg|png|tiff'; // On indique les types autorisés 
                 $this->load->library('upload'); // On charge la librairie 'upload'
                 $this->upload->initialize($config); // On initialise la config
-                
-                if(!$this->ulpoad->do_upload('fichier')) { // La méthode do_upload() effectue les validations sur l'attribut HTML 'name' ('fichier' dans notre formulaire) et si OK renomme et déplace le fichier tel que configuré
-                    $this->load->view('ajouter');
-                    $sUploadErrors= $this->upload->display_errors('<div class="alert alert-danger">', '</div>'); // Echec : on récupère les erreurs dans une variable (une chaîne)
+
+                if(!$this->upload->do_upload('fichier')) {
+                     // La méthode do_upload() effectue les validations sur l'attribut HTML 'name' ('fichier' dans notre formulaire) et si OK renomme et déplace le fichier tel que configuré
+                    $sUploadErrors= $this->upload->display_errors(); // Echec : on récupère les erreurs dans une variable (une chaîne)
                     $View['sUploadErrors']= $sUploadErrors; // on réaffiche la vue du formulaire en passant les erreurs 
+                    $View['fetch_cat']= $this->ajouter_model->fetch_cat(); 
                     error_log($sUploadErrors, 0); //  On envoie le message d'erreur dans le fichier php_error.log
                     $this->load->library('session'); // avec la librairie session on envoie un message flash à l'utilisateur
-                    $this->session->set_flashdata('sUploadError2','Le téléchargement de la photo a échoué.');
-                    $aUploadDatas= $this->upload->data();  // récupère (dans un tableau PHP) les informations d'origine sur le fichier téléchargé. 
-                    var_dump($aUploadDatas);
+                    $this->session->set_flashdata("fichier", "<div class='alert alert-danger p-1'>Le téléchargement de la photo a échoué </div>");
+                    $aUploadDatas= $this->upload->data(); // récupère (dans un tableau PHP) les informations d'origine sur le fichier téléchargé. 
+                    // var_dump($aUploadDatas);
                     $this->load->view('ajouter', $View);
-                } else {
-                    $ajout['ajouter']= $this->ajouter_model->ajouterPanier($data);
+                } else {  
+                    $ajout['ajouter']= $this->ajouter_model->ajouter($data); // ajout dans la bdd 
                     redirect("Main/liste");
-                }
-                
+                }               
             }
         } else {
             $this->load->view('ajouter', $cat);
